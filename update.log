@@ -1,0 +1,53 @@
+Update Log
+2018/08/05:
+1.	Changed jacc_coef method in metrics.py, when it is under 0.65, an pictures' jacc score is set to 0. In case of training process entering a all-0 environment, jacc_coef_ori was kept for jacc_loss.
+
+2018/08/06:
+1.	Added comments on data_gen_args parts and added parameters:
+		zca_epsilon=1e-6,
+		preprocessing_function=None,
+
+2018/08/07:
+1.	Changed data division type.
+	Added `project_path` to control project base path, the project should be orgnized like:
+		>project_path/	>datasets/	>2017/	>Training/
+											>Validation/
+											>Test/
+											>resized/
+									>2018/
+									>manu/
+						>workspace/	>python files
+									>update log
+	So developer can control which division type using `datasets_div` of 'isic' or 'manu'.
+	What's more, all resized pictures will be saved into resized/ folder, no matter which stage you are. Because former
+	use can recall it from the list, it is not necessary to delete the resized/ folder. But if you 1. change the resize
+	size 2. Didn't have all of pictures in resized/ folder, you should delete the folder and do retrain.
+	It's hard to remember so when it goes wrong just delete resized/ folder and resize all of pics.
+
+**CAUTION: Remember deleting resized/ folder manully in above situations.
+
+**WARNING: We didn't used os.path.join() so it may cause problem when transplant to other OS.
+
+2.	All models in models.py are reset to the state that uses segment only and set classification loss to 0.00.
+
+**WARNING: Unet-2 isn't compiled with (segment_result, classification_result) output, change it when using in case of potential error.
+
+**VERSION: We noticed that this version faces severe problem that it uses classification but in ISIC_2018 training we didn't provide with .csv file. So I decided to update the version to v2.0 and delete the classification function (while classification multi-task surely didn't give any profit.)
+
+2018/08/08:
+**UPDATED: v2.0
+1.	Deleted all classification-related codes.
+2.	Move VGG16_PRETRAINED_NOTOP path to train_sgmt.py and be passed by function parameter rather than a global variable in models.py.
+
+2018/08/09:
+v2.0
+1.	Fix metrics bug and only calculate '0.65' rule under evaluation and test processing.
+
+**WARNING: Version before v2.1 is unusable because of that.
+
+2018/08/11:
+v2.1
+1.	Changed the data_aug_args and fit it. Test results saved in segment/log/test_v2.log
+
+[master] v2.3 - 18/08/20
+1.	Added `random_crop_image` method and added `isic_utils.py`. `random_crop_image` is used in `preprocessing_function`.
