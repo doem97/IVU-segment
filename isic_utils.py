@@ -1,8 +1,8 @@
 import numpy as np
-from scipy import misc
 import cv2
 
-def random_crop_image(image):
+def random_crop_image(image, crop_size=()):
+    '''Read image of size(color_channel, width, height) and crop it with.'''
     image_temp = np.zeros(image.shape)
     height, width = image.shape[1:3]
     random_array = np.random.random(size=4)
