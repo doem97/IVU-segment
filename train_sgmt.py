@@ -13,7 +13,7 @@ from keras.models import load_model
 import ISIC2018_dataset as ISIC
 import models
 from metrics import dice_loss, jacc_loss, jacc_coef, dice_jacc_mean
-from isic_utils import random_crop_image
+from isic_utils import random_crop_image, fixed_crop_image
 import pdb
 
 # Base Environment
@@ -212,7 +212,7 @@ if do_train:
           fill_mode='reflect', 
           horizontal_flip=False,
           vertical_flip=False,
-          preprocessing_function=random_crop_image,
+          preprocessing_function=fixed_crop_image,
           dim_ordering=K.image_dim_ordering())
     data_gen_mask_args = dict(
             data_gen_args.items() + {'fill_mode':'nearest',
