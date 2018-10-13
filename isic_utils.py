@@ -1,34 +1,34 @@
 import numpy as np
 import cv2
+import os
+import sys
+import random
 
-def random_crop_image(image, crop_size=()):
-    '''Read image of size(color_channel, width, height) and crop it with.'''
+def random_crop_image(image):
+    img_name = str(random.randint(0,65530))
     image_temp = np.zeros(image.shape)
-    height, width = image.shape[1:3]
-    #random_array = np.random.random(size=4)
-    random_array = [0.75,0.75,0.75,0.75]
-    w = int((width*0.5)*(1+random_array[0]*0.5))
-    h = int((height*0.5)*(1+random_array[1]*0.5))
-    x = int(random_array[2]*(width-w))
-    y = int(random_array[3]*(height-h))
+    height, width = image.shape[1:]
+    w = int((width*0.5)*(1+0.5*0.5))
+    h = int((height*0.5)*(1+0.5*0.5))
+    x = int(0.5*(width-w))
+    y = int(0.5*(height-h))
 
-    image_crop = image[0:3,y:h+y,x:w+x]
+    image_crop = image[:,y:h+y,x:w+x]
     for index, i in enumerate(image_crop):
         image_temp[index] = cv2.resize(i, (width, height))
-    return image_temp
+    return image_temp #(channel, height, width)
 
-def fixed_crop_image(image, crop_size=()):
-    '''Read image of size(color_channel, width, height) and crop it with.'''
-    image_temp = np.zeros(image.shape)
-    height, width = image.shape[1:3]
-    #random_array = np.random.random(size=4)
-    fixed_array = [0.75,0.75,0.75,0.75]
-    w = int((width*0.5)*(1+fixed_array[0]*0.5))
-    h = int((height*0.5)*(1+fixed_array[1]*0.5))
-    x = int(fixed_array[2]*(width-w))
-    y = int(fixed_array[3]*(height-h))
+def save_pred_images(image_package, img_list, save_path):
+    if os.path.exists(save_path):
+        print("the path %s already exists!" % save_path)
+        sys.exit(0)
+    else:
+        os.makedirs(save_path)
+    image_package = image_package.transpose((0,2,3,1))
+    for index, i in enumerate(image_package):
+        temp_path = save_path + "/" + img_list[index]
+        cv2.imwrite(temp_path, i)
 
-    image_crop = image[0:3,y:h+y,x:w+x]
-    for index, i in enumerate(image_crop):
-        image_temp[index] = cv2.resize(i, (width, height))
-    return image_temp
+def save_chw_image(image, save_path):
+    image = image.transpose((1,2,0))
+    cv2.imwrite(save_path, image)
