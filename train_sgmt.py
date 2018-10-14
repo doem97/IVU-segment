@@ -39,7 +39,7 @@ initial_epoch = 0
 n_epoch = 500
 fc_size = 4000
 
-do_resize = False
+do_resize = True
 do_train = True
 do_evaluate = True
 do_test = True
@@ -49,7 +49,7 @@ channels = 3
 remove_mean_imagenet = False
 remove_mean_dataset = False
 remove_mean_samplewise = False
-rescale_mask = True
+rescale_mask = False
 datasets_div = 'manu' # 'isic', 'manu' for division type
 year = "2017"
 
@@ -85,6 +85,10 @@ elif datasets_div == 'manu':
     te_folder = project_path + "datasets/manual/Test"
     te_mask_folder = project_path + "datasets/manual/Test_GroundTruth"
     resized_image_folder = project_path + "datasets/manual/resized"
+
+pred_mask_folder = project_path + "pred_picture/"
+pred_val_mask_folder = pred_mask_folder + "validation"
+pred_te_mask_folder = pred_mask_folder + "test"
 
 def myGenerator(image_generator, mask_generator):
     while True:
@@ -250,6 +254,7 @@ if do_train:
 if do_evaluate:
     model.load_weights(model_filename)
     val_pred_mask = model.predict(val_image)
+    save_pred_images(val_pred_mask, val_list, pred_val_mask_folder)
     for pixel_threshold in [0.5]: # np.arange(0.3, 1, 0.05):
         val_pred_mask = np.where(val_pred_mask>=pixel_threshold, 1, 0)
         val_pred_mask = val_pred_mask * 255
@@ -269,6 +274,7 @@ if do_test:
     te_image = te_image/127.5 - 1
     model.load_weights(model_filename)
     te_pred_mask = model.predict(te_image)
+    save_pred_images(te_pred_mask, te_list, pred_te_mask_folder)
     for pixel_threshold in [0.5]: # np.arange(0.3, 1, 0.05):
         te_pred_mask = np.where(te_pred_mask>=pixel_threshold, 1, 0)
         te_pred_mask = te_pred_mask * 255
@@ -279,5 +285,3 @@ if do_test:
         dice, jacc = dice_jacc_mean(te_mask, te_pred_mask, smooth = 0)
         print "Resized te dice coef: {:.4f}".format(dice)
         print "Resized te jacc coef: {:.4f}".format(jacc)
-
-
