@@ -27,8 +27,10 @@ def save_pred_images(image_package, img_list, save_path):
     image_package = image_package.transpose((0,2,3,1))
     for index, i in enumerate(image_package):
         temp_path = save_path + "/" + img_list[index]
+        i = i*255
         cv2.imwrite(temp_path, i)
 
 def save_chw_image(image, save_path):
     image = image.transpose((1,2,0))
+    image = image*255
     cv2.imwrite(save_path, image)

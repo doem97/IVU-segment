@@ -49,7 +49,7 @@ channels = 3
 remove_mean_imagenet = False
 remove_mean_dataset = False
 remove_mean_samplewise = False
-rescale_mask = False
+rescale_mask = True # Attention: rescale_mask must be true cause in later evaluation, it will multiple 255
 datasets_div = 'manu' # 'isic', 'manu' for division type
 year = "2017"
 
