@@ -3,6 +3,7 @@ import cv2
 import os
 import sys
 import random
+import shutil
 
 def random_crop_image(image):
     img_name = str(random.randint(0,65530))
@@ -20,8 +21,9 @@ def random_crop_image(image):
 
 def save_pred_images(image_package, img_list, save_path):
     if os.path.exists(save_path):
-        print("the path %s already exists!" % save_path)
-        sys.exit(0)
+        print("the path %s already exists! It will be cleared." % save_path)
+        shutil.rmtree(save_path)
+        os.makedirs(save_path)
     else:
         os.makedirs(save_path)
     image_package = image_package.transpose((0,2,3,1))
