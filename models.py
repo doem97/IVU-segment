@@ -104,13 +104,14 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_2')(conv4)
     conv4 = ZeroPadding2D((1, 1))(conv4)
     conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_3')(conv4)
-    
-    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (4,4), activation='relu', name='conv5_1')(conv4)
+    pool4 = MaxPooling2D((1, 1))(conv4)
+
+    pad5 = ZeroPadding2D((0, 0))(pool4)
+    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (4,4), activation='relu', name='conv5_1')(pad5)
     conv5 = ZeroPadding2D((2, 2))(conv5)
     conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_2')(conv5)
     conv5 = ZeroPadding2D((2, 2))(conv5)
     conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_3')(conv5)
-
 
     model = Model(input=inputs, output=conv5)
     print(model.summary())
