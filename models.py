@@ -1,7 +1,7 @@
 import numpy as np
 from keras.models import Model
 from keras.layers import merge, Flatten, Dense, Input, Dropout, Activation, Reshape
-from keras.layers import Convolution2D, MaxPooling2D, ZeroPadding2D, UpSampling2D
+from keras.layers import Convolution2D, MaxPooling2D, ZeroPadding2D, UpSampling2D, AtrousConvolution2D
 from keras.layers import BatchNormalization
 from keras.layers.noise import GaussianNoise
 import h5py
