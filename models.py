@@ -76,7 +76,7 @@ def Unet(img_rows, img_cols, custom_loss , optimizer, custom_metrics, fc_size = 
 
     return model
 
-def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optimizer, custom_metrics, channels=3):
+def VGG16a(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optimizer, custom_metrics, channels=3):
     inputs = Input((channels, img_rows, img_cols))
     pad1 = ZeroPadding2D((1, 1), input_shape=(channels, img_rows, img_cols))(inputs)
     conv1 = Convolution2D(64, 3, 3, activation='relu', name='conv1_1')(pad1)
@@ -104,22 +104,23 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_2')(conv4)
     conv4 = ZeroPadding2D((1, 1))(conv4)
     conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_3')(conv4)
-    pool4 = MaxPooling2D((2, 2), strides=(2, 2))(conv4)
+    # pool4 = MaxPooling2D((2, 2), strides=(2, 2))(conv4)
 
-    pad5 = ZeroPadding2D((1, 1))(pool4)
-    conv5 = Convolution2D(512, 3, 3, activation='relu', name='conv5_1')(pad5)
-    conv5 = ZeroPadding2D((1, 1))(conv5)
-    conv5 = Convolution2D(512, 3, 3, activation='relu', name='conv5_2')(conv5)
-    conv5 = ZeroPadding2D((1, 1))(conv5)
-    conv5 = Convolution2D(512, 3, 3, activation='relu', name='conv5_3')(conv5)
+    pad5 = ZeroPadding2D((2, 2))(conv4)
+    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_1')(pad5)
+    conv5 = ZeroPadding2D((2, 2))(conv5)
+    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_2')(conv5)
+    conv5 = ZeroPadding2D((2, 2))(conv5)
+    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_3')(conv5)
 
     model = Model(input=inputs, output=conv5)
+    print(model.summary())
     # load weights
     if pretrained:
         weights_path = pretrained
         f = h5py.File(weights_path)
         for k in range(f.attrs['nb_layers']):
-            if k >= (len(model.layers) - 1):
+            if k >= (len(model.layers) - 7):
                 # ignore the last layers in the savefile
                 break
             g = f['layer_{}'.format(k)]
@@ -133,7 +134,7 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
                 layer.trainable = False
 
     dropout_val = 0.5
-    up6 = merge([UpSampling2D(size=(2, 2))(conv5), conv4], mode='concat', concat_axis=1)
+    up6 = merge([conv5, conv4], mode='concat', concat_axis=1)
     up6 = Dropout(dropout_val)(up6)
 
     conv6 = Convolution2D(256, 3, 3, activation='relu', border_mode='same')(up6)
