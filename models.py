@@ -76,7 +76,7 @@ def Unet(img_rows, img_cols, custom_loss , optimizer, custom_metrics, fc_size = 
 
     return model
 
-def VGG16a(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optimizer, custom_metrics, channels=3):
+def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optimizer, custom_metrics, channels=3):
     inputs = Input((channels, img_rows, img_cols))
     pad1 = ZeroPadding2D((1, 1), input_shape=(channels, img_rows, img_cols))(inputs)
     conv1 = Convolution2D(64, 3, 3, activation='relu', name='conv1_1')(pad1)
