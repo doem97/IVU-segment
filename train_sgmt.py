@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from keras.utils import np_utils
-from keras import backend as K 
+from keras import backend as K
 from keras.optimizers import Adam, SGD
 from keras.callbacks import ModelCheckpoint 
 from keras.preprocessing.image import ImageDataGenerator
