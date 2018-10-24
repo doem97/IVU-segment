@@ -96,14 +96,14 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_2')(conv3)
     conv3 = ZeroPadding2D((1, 1))(conv3)
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_3')(conv3)
-    pool3 = MaxPooling2D((2, 2), strides=(2, 2))(conv3)
+    pool3 = MaxPooling2D((1, 1))(conv3)
 
-    pad4 = ZeroPadding2D((1, 1))(pool3)
-    conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_1')(pad4)
-    conv4 = ZeroPadding2D((1, 1))(conv4)
-    conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_2')(conv4)
-    conv4 = ZeroPadding2D((1, 1))(conv4)
-    conv4 = Convolution2D(512, 3, 3, activation='relu', name='conv4_3')(conv4)
+    pad4 = ZeroPadding2D((0, 0))(pool3)
+    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (8,8), activation='relu', name='conv4_1')(pad4)
+    conv4 = ZeroPadding2D((2, 2))(conv4)
+    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv4_2')(conv4)
+    conv4 = ZeroPadding2D((2, 2))(conv4)
+    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv4_3')(conv4)
     pool4 = MaxPooling2D((1, 1))(conv4)
 
     pad5 = ZeroPadding2D((0, 0))(pool4)
@@ -112,6 +112,7 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_2')(conv5)
     conv5 = ZeroPadding2D((2, 2))(conv5)
     conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_3')(conv5)
+
 
     model = Model(input=inputs, output=conv5)
     print(model.summary())
