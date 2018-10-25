@@ -375,6 +375,7 @@ def dilated_unet(img_rows, img_cols, custom_loss ,optimizer, custom_metrics, dil
     conv_up_final = Convolution2D(1, 1, 1, activation='sigmoid', name = 'conv_up_final')(b18)
 
     model = Model(input=inputs, output=conv_up_final) # dimention of output: 128*128*1+3
+    print(model.summary())
 
     model.compile(optimizer = optimizer, loss = custom_loss, metrics = custom_metrics)
 

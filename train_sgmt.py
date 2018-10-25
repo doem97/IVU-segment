@@ -124,7 +124,7 @@ elif model_type =='vgg':
     VGG16_WEIGHTS_NOTOP = project_path + 'pretrained_weights/vgg16_notop.h5'
     model = models.VGG16(height, width, pretrained=VGG16_WEIGHTS_NOTOP, freeze_pretrained = False, custom_loss = custom_loss, optimizer = optimizer, custom_metrics = custom_metric)
     monitor_metric = 'val_jacc_coef'
-elif model_type = 'dilated_unet':
+elif model_type == 'dilated_unet':
     model = models.dilated_unet(height, width, custom_loss = custom_loss, optimizer = optimizer, custom_metrics = custom_metric)
 
 if do_stage == 1:
