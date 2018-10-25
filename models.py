@@ -96,7 +96,7 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_2')(conv3)
     conv3 = ZeroPadding2D((1, 1))(conv3)
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_3')(conv3)
-    pool3 = MaxPooling2D((2, 2))(conv3)
+    pool3 = MaxPooling2D((2, 2), strides=(2, 2))(conv3)
 
     pad4 = ZeroPadding2D((1, 1))(pool3)
     conv4 = AtrousConvolution2D(512, 3, 3, activation='relu', name='conv4_1')(pad4)
