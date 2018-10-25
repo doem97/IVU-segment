@@ -96,18 +96,17 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_2')(conv3)
     conv3 = ZeroPadding2D((1, 1))(conv3)
     conv3 = Convolution2D(256, 3, 3, activation='relu', name='conv3_3')(conv3)
-    pool3 = MaxPooling2D((1, 1))(conv3)
+    pool3 = MaxPooling2D((2, 2))(conv3)
 
-    pad4 = ZeroPadding2D((0, 0))(pool3)
-    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (8,8), activation='relu', name='conv4_1')(pad4)
-    conv4 = ZeroPadding2D((2, 2))(conv4)
-    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv4_2')(conv4)
-    conv4 = ZeroPadding2D((2, 2))(conv4)
-    conv4 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv4_3')(conv4)
-    pool4 = MaxPooling2D((1, 1))(conv4)
+    pad4 = ZeroPadding2D((1, 1))(pool3)
+    conv4 = AtrousConvolution2D(512, 3, 3, activation='relu', name='conv4_1')(pad4)
+    conv4 = ZeroPadding2D((1, 1))(conv4)
+    conv4 = AtrousConvolution2D(512, 3, 3, activation='relu', name='conv4_2')(conv4)
+    conv4 = ZeroPadding2D((1, 1))(conv4)
+    conv4 = AtrousConvolution2D(512, 3, 3, activation='relu', name='conv4_3')(conv4)
 
-    pad5 = ZeroPadding2D((0, 0))(pool4)
-    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (4,4), activation='relu', name='conv5_1')(pad5)
+    pad5 = ZeroPadding2D((2, 2))(conv4)
+    conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_1')(pad5)
     conv5 = ZeroPadding2D((2, 2))(conv5)
     conv5 = AtrousConvolution2D(512, 3, 3, atrous_rate = (2,2), activation='relu', name='conv5_2')(conv5)
     conv5 = ZeroPadding2D((2, 2))(conv5)
@@ -115,13 +114,13 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
 
 
     model = Model(input=inputs, output=conv5)
-    print(model.summary())
+    
     # load weights
     if pretrained:
         weights_path = pretrained
         f = h5py.File(weights_path)
         for k in range(f.attrs['nb_layers']):
-            if k >= (len(model.layers) - 1):
+            if k >= (len(model.layers) - 8):
                 # ignore the last layers in the savefile
                 break
             g = f['layer_{}'.format(k)]
@@ -135,33 +134,29 @@ def VGG16(img_rows, img_cols, pretrained, freeze_pretrained, custom_loss , optim
                 layer.trainable = False
 
     dropout_val = 0.5
-    up6 = merge([UpSampling2D(size=(2, 2))(conv5), conv4], mode='concat', concat_axis=1)
-    up6 = Dropout(dropout_val)(up6)
 
-    conv6 = Convolution2D(256, 3, 3, activation='relu', border_mode='same')(up6)
-    conv6 = Convolution2D(256, 3, 3, activation='relu', border_mode='same')(conv6)
-
-    up7 = merge([UpSampling2D(size=(2, 2))(conv6), conv3], mode='concat', concat_axis=1)
+    up7 = merge([UpSampling2D(size=(2, 2))(conv5), conv3], mode='concat', concat_axis=1)
     up7 = Dropout(dropout_val)(up7)
 
-    conv7 = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(up7)
-    conv7 = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(conv7)
+    conv7 = Convolution2D(128, 3, 3, activation='relu', border_mode='same', name = 'conv7_1')(up7)
+    conv7 = Convolution2D(128, 3, 3, activation='relu', border_mode='same', name = 'conv7_2')(conv7)
 
     up8 = merge([UpSampling2D(size=(2, 2))(conv7), conv2], mode='concat', concat_axis=1)
     up8 = Dropout(dropout_val)(up8)
 
-    conv8 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(up8)
-    conv8 = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(conv8)
+    conv8 = Convolution2D(64, 3, 3, activation='relu', border_mode='same', name = 'conv8_1')(up8)
+    conv8 = Convolution2D(64, 3, 3, activation='relu', border_mode='same', name = 'conv8_2')(conv8)
 
     up9 = merge([UpSampling2D(size=(2, 2))(conv8), conv1], mode='concat', concat_axis=1)
     up9 = Dropout(dropout_val)(up9)
 
-    conv9 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(up9)
-    conv9 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv9)
+    conv9 = Convolution2D(32, 3, 3, activation='relu', border_mode='same', name = 'conv9_1')(up9)
+    conv9 = Convolution2D(32, 3, 3, activation='relu', border_mode='same', name = 'conv9_2')(conv9)
 
     conv10 = Convolution2D(1, 1, 1, activation='sigmoid', name = 'conv10')(conv9)
 
     model = Model(input=inputs, output=conv10) # dimention of output: 128*128*1+3
+    print(model.summary())
 
     model.compile(optimizer = optimizer, loss = custom_loss, metrics = custom_metrics)
 
