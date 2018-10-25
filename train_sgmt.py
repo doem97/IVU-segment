@@ -126,6 +126,7 @@ elif model_type =='vgg':
     monitor_metric = 'val_jacc_coef'
 elif model_type == 'dilated_unet':
     model = models.dilated_unet(height, width, custom_loss = custom_loss, optimizer = optimizer, custom_metrics = custom_metric)
+    monitor_metric = 'val_jacc_coef'
 
 if do_stage == 1:
     split_ratio = [4, 1, 1]
