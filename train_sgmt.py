@@ -24,7 +24,7 @@ seed = 1
 
 # Model Settings
 pre_model = None #project_path + "weights/{}.h5".format('test')
-model_type = 'vgg'
+model_type = 'dilated_unet'
 model_filename = project_path + "weights/temp.h5" # Suggest that everytime a new model trained as temp.h5 and be renamed later.
 custom_loss = dice_loss
 optimizer = Adam(lr=1e-5)
@@ -124,6 +124,8 @@ elif model_type =='vgg':
     VGG16_WEIGHTS_NOTOP = project_path + 'pretrained_weights/vgg16_notop.h5'
     model = models.VGG16(height, width, pretrained=VGG16_WEIGHTS_NOTOP, freeze_pretrained = False, custom_loss = custom_loss, optimizer = optimizer, custom_metrics = custom_metric)
     monitor_metric = 'val_jacc_coef'
+elif model_type = 'dilated_unet':
+    model = models.dilated_unet(height, width, custom_loss = custom_loss, optimizer = optimizer, custom_metrics = custom_metric)
 
 if do_stage == 1:
     split_ratio = [4, 1, 1]

@@ -239,3 +239,143 @@ def Unet2(img_rows, img_cols, custom_loss , optimizer, custom_metrics, fc_size =
     model.compile(optimizer=optimizer, loss=custom_loss, metrics=custom_metrics)
 
     return model
+
+def dilated_unet(img_rows, img_cols, custom_loss ,optimizer, custom_metrics, dilate = 1, addition = True, atrous_rate = (2, 2), channels=3):
+    
+    inputs = Input((channels, img_rows, img_cols))
+
+    conv_down_1 = Convolution2D(64, 3, 3, activation = 'relu', input_shape=(channels, img_rows, img_cols), border_mode = 'same', name='conv_down_1_1')(inputs)
+    b1 = BatchNormalization()(conv_down_1)
+    b1 = Dropout(0.3)(b1)
+
+    conv_down_1 = AtrousConvolution2D(64, 3, 3, atrous_rate = atrous_rate, activation = 'relu', border_mode = 'same', name='conv_down_1_2')(b1)
+    b2 = BatchNormalization()(conv_down_1)
+    b2 = Dropout(0.3)(b2)
+
+    pool1 = MaxPooling2D((2,2), strides = (2,2))(b2)
+    pool1 = Dropout(0.3)(pool1)
+
+    conv_down_2 = Convolution2D(128, 3, 3, activation = 'relu', border_mode = 'same', name='conv_down_2_1')(pool1)
+    b3 = BatchNormalization()(conv_down_2)
+    b3 = Dropout(0.3)(b3)
+
+    conv_down_2 = AtrousConvolution2D(128, 3, 3, atrous_rate = atrous_rate, activation = 'relu', border_mode = 'same', name='conv_down_2_2')(b3)
+    b4 = BatchNormalization()(conv_down_2)
+    b4 = Dropout(0.3)(b4)
+
+    pool2 = MaxPooling2D((2,2), strides = (2,2))(b4)
+    pool2 = Dropout(0.3)(pool2)
+
+    conv_down_3 = Convolution2D(256, 3, 3, activation = 'relu', border_mode = 'same', name='conv_down_3_1')(pool2)
+    b5 = BatchNormalization()(conv_down_3)
+    b5 = Dropout(0.3)(b5)
+
+    conv_down_3 = AtrousConvolution2D(256, 3, 3, atrous_rate = atrous_rate, activation = 'relu', border_mode = 'same', name='conv_down_3_2')(b5)
+    b6 = BatchNormalization()(conv_down_3)
+    b6 = Dropout(0.3)(b6)
+
+    pool3 = MaxPooling2D((2,2), strides = (2,2))(b6)
+    pool3 = Dropout(0.3)(pool3)
+
+    if dilate == 1:
+        dilate1 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila1')(pool3)
+
+        b7 = BatchNormalization()(dilate1)
+        b7 = Dropout(0.3)(b7)
+
+        dilate2 = AtrousConvolution2D(256, 3, 3, atrous_rate = (2,2), activation='relu', border_mode = 'same', name='dila2')(b7)
+
+        b8 = BatchNormalization()(dilate2)
+        b8 = Dropout(0.3)(b8)
+
+        dilate3 = AtrousConvolution2D(256, 3, 3, atrous_rate = (4,4), activation='relu', border_mode = 'same', name='dila3')(b8)
+
+        b9 = BatchNormalization()(dilate3)
+        b9 = Dropout(0.3)(b9)
+
+        dilate4 = AtrousConvolution2D(256, 3, 3, atrous_rate = (8,8), activation='relu', border_mode = 'same', name='dila4')(b9)
+
+        b10 = BatchNormalization()(dilate4)
+        b10 = Dropout(0.3)(b10)
+
+        dilate5 = AtrousConvolution2D(256, 3, 3, atrous_rate = (16,16), activation='relu', border_mode = 'same', name='dila5')(b10)
+
+        b11 = BatchNormalization()(dilate5)
+        b11 = Dropout(0.3)(b11)
+
+        dilate6 = AtrousConvolution2D(256, 3, 3, atrous_rate = (32,32), activation='relu', border_mode = 'same', name='dila6')(b11)
+
+        if addition == True:
+            dilate_all_added = merge([dilate1, dilate2, dilate3, dilate4, dilate5, dilate6])
+            up_di = UpSampling2D((2, 2))(dilate_all_added)
+        else:
+            up_di = UpSampling2D((2, 2))(dilate6)
+
+    else:
+        dilate1 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila1')(pool3)
+
+        b7 = BatchNormalization()(dilate1)
+        b7 = Dropout(0.3)(b7)
+
+        dilate2 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila2')(b7)
+
+        b8 = BatchNormalization()(dilate2)
+        b8 = Dropout(0.3)(b8)
+
+        dilate3 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila3')(b8)
+
+        b9 = BatchNormalization()(dilate3)
+        b9 = Dropout(0.3)(b9)
+
+        dilate4 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila4')(b9)
+
+        b10 = BatchNormalization()(dilate4)
+        b10 = Dropout(0.3)(b10)
+
+        dilate5 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila5')(b10)
+
+        b11 = BatchNormalization()(dilate5)
+        b11 = Dropout(0.3)(b11)
+
+        dilate6 = AtrousConvolution2D(256, 3, 3, atrous_rate = (1,1), activation='relu', border_mode = 'same', name='dila6')(b11)
+
+        if addition == True:
+            dilate_all_added = merge([dilate1, dilate2, dilate3, dilate4, dilate5, dilate6])
+            up_di = UpSampling2D((2, 2))(dilate_all_added)
+        else:
+            up_di = UpSampling2D((2, 2))(dilate6)
+    
+    conv_up_3 = Convolution2D(128, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_3_1')(up_di)
+    conv_up_3 = merge([conv_down_3, conv_up_3], mode = 'concat', concat_axis = 1)
+    b12 = BatchNormalization()(conv_up_3)
+    b12 = Dropout(0.3)(b12)
+    conv_up_3 = Convolution2D(128, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_3_2')(b12) 
+    b13 = BatchNormalization()(conv_up_3)
+    conv_up_3 = Convolution2D(128, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_3_3')(b13)
+
+    up_2 = UpSampling2D((2, 2))(conv_up_3)
+    conv_up_2 = Convolution2D(64, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_2_1')(up_2)
+    conv_up_2 = merge([conv_down_2, conv_up_2], mode = 'concat', concat_axis = 1)
+    b14 = BatchNormalization()(conv_up_2)
+    b14 = Dropout(0.3)(b14)
+    conv_up_2 = Convolution2D(64, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_2_2')(b14) 
+    b15 = BatchNormalization()(conv_up_2)
+    conv_up_2 = Convolution2D(64, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_2_3')(b15)
+
+    up_1 = UpSampling2D((2,2))(conv_up_2)
+    conv_up_1 = Convolution2D(32, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_1_1')(up_1)
+    conv_up_1 = merge([conv_down_1, conv_up_1], mode = 'concat', concat_axis = 1)
+    b16 = BatchNormalization()(conv_up_1)
+    b16 = Dropout(0.3)(b16)
+    conv_up_1 = Convolution2D(32, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_1_2')(b16) 
+    b17 = BatchNormalization()(conv_up_1)
+    conv_up_1 = Convolution2D(32, 3, 3, activation = 'relu', border_mode = 'same', name = 'conv_up_1_3')(b17)
+    b18 = BatchNormalization()(conv_up_1)
+
+    conv_up_final = Convolution2D(1, 1, 1, activation='sigmoid', name = 'conv_up_final')(b18)
+
+    model = Model(input=inputs, output=conv_up_final) # dimention of output: 128*128*1+3
+
+    model.compile(optimizer = optimizer, loss = custom_loss, metrics = custom_metrics)
+
+    return model
