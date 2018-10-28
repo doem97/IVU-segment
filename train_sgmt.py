@@ -24,7 +24,7 @@ seed = 1
 
 # Model Settings
 pre_model = None #project_path + "weights/{}.h5".format('test')
-model_type = 'dilated_vgg'
+model_type = 'vgg'
 model_filename = project_path + "weights/temp.h5" # Suggest that everytime a new model trained as temp.h5 and be renamed later.
 custom_loss = dice_loss
 optimizer = Adam(lr=1e-5)
