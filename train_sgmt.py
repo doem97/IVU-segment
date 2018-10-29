@@ -223,7 +223,6 @@ if do_train:
           fill_mode='reflect', 
           horizontal_flip=False,
           vertical_flip=False,
-          preprocessing_function=random_crop_image,
           dim_ordering=K.image_dim_ordering())
     data_gen_mask_args = dict(
             data_gen_args.items() + {'fill_mode':'nearest',
